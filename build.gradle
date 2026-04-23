@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.3.1'
+}
+
+group = 'com.dxunvrs'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://maven.dxunvrs.ru/releases"
+        allowInsecureProtocol = true
+    }
+}
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:latest.release'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:latest.release'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:latest.release'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'ch.qos.logback:logback-classic:latest.release'
+
+    implementation 'org.jline:jline:3.30.0'
+
+    implementation 'com.dxunvrs:common:latest.release'
+
+}
