@@ -38,17 +38,6 @@ public class I18n {
         return b;
     }
 
-    public TextField promptField(String key) {
-        TextField f = new TextField();
-        f.promptTextProperty().bind(bind(key));
-        return f;
-    }
-
-    public <S> TableColumn<S, ?> setColText(TableColumn<S, ?> column, String key) {
-        column.textProperty().bind(bind(key));
-        return column;
-    }
-
     public void bindStageTitle(Stage stage, String key) {
         stage.titleProperty().bind(bind(key));
     }

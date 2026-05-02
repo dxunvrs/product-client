@@ -1,11 +1,7 @@
 package gui.service;
 
 import models.Product;
-import network.ConnectionManager;
-import network.Request;
-import network.RequestType;
-import network.Response;
-import network.ResponseType;
+import network.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +17,6 @@ public class ClientService implements AutoCloseable {
 
     public ClientService(ConnectionManager connection) {
         this.connection = connection;
-    }
-    public String getToken() {
-        return token;
     }
 
     public String getCurrentUsername() {
@@ -56,11 +49,6 @@ public class ClientService implements AutoCloseable {
             this.currentUsername = username;
         }
         return resp;
-    }
-
-    public void logout() {
-        this.token = null;
-        this.currentUsername = null;
     }
 
     public Response sync() {

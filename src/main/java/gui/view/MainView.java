@@ -11,17 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -96,7 +86,6 @@ public class MainView {
 
         poller.scheduleWithFixedDelay(this::refreshCollection, POLL_SECONDS, POLL_SECONDS, TimeUnit.SECONDS);
 
-        // re-render when locale changes
         localeManager.localeProperty().addListener((o, a, b) -> rebuildTableColumns());
         rebuildTableColumns();
         applyFilterAndSort();
