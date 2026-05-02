@@ -13,7 +13,7 @@ public class GUIClient extends Application {
     private static final Logger logger = LoggerFactory.getLogger(GUIClient.class);
 
     private Stage primaryStage;
-    private ClientService clientService;
+    private ClientService service;
 
     private String defaultHost = "localhost";
     private int defaultPort = 1984;
@@ -32,5 +32,19 @@ public class GUIClient extends Application {
     @Override
     public void stop() {
 
+    }
+
+    public void onLoggedIn(ClientService service) {
+        this.service = service;
+    }
+
+    public void onLogout() {
+        if (service != null) {
+            try {
+                service.close();
+            } catch (Exception e) {
+                logger.error("Close exception", e);
+            }
+        }
     }
 }
