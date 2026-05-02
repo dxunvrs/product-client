@@ -1,16 +1,21 @@
 plugins {
     id 'java'
     id 'com.gradleup.shadow' version '9.3.1'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 group = 'com.dxunvrs'
 version = '1.0'
 
+javafx {
+    version = '21.0.5'
+    modules = ['javafx.controls', 'javafx.graphics']
+}
+
 repositories {
     mavenCentral()
     maven {
-        url "http://maven.dxunvrs.ru/releases"
-        allowInsecureProtocol = true
+        url "https://maven.dxunvrs.ru/releases"
     }
 }
 
@@ -25,4 +30,10 @@ dependencies {
 
     implementation 'com.dxunvrs:common:latest.release'
 
+}
+
+jar {
+    manifest {
+        attributes["Main-Class"] = "Main"
+    }
 }
