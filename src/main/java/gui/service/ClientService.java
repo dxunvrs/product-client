@@ -9,36 +9,26 @@ import network.ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.SocketException;
 import java.util.List;
 
-/**
- * Тонкая обёртка над {@link ConnectionManager}, синхронизированная для использования
- * из GUI-потока и фонового поллера. Хранит токен и id текущего пользователя.
- */
 public class ClientService implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
 
-    private final String host;
-    private final int port;
     private final ConnectionManager connection;
 
     private volatile String token;
-    private volatile Integer currentUserId;
     private volatile String currentUsername;
 
-    public ClientService(String host, int port) throws SocketException {
-        this.host = host;
-        this.port = port;
-        this.connection = new ConnectionManager(host, port);
+    public ClientService(ConnectionManager connection) {
+        this.connection = connection;
+    }
+    public String getToken() {
+        return token;
     }
 
-    public String getHost() { return host; }
-    public int getPort() { return port; }
-
-    public String getToken() { return token; }
-    public Integer getCurrentUserId() { return currentUserId; }
-    public String getCurrentUsername() { return currentUsername; }
+    public String getCurrentUsername() {
+        return currentUsername;
+    }
 
     public synchronized Response send(Request request) {
         return connection.sendAndReceive(request);
@@ -51,7 +41,6 @@ public class ClientService implements AutoCloseable {
         Response resp = send(req);
         if (resp.getType() == ResponseType.AUTH_SUCCESS) {
             this.token = resp.getToken();
-            this.currentUserId = resp.getUserId();
             this.currentUsername = username;
         }
         return resp;
@@ -64,7 +53,6 @@ public class ClientService implements AutoCloseable {
         Response resp = send(req);
         if (resp.getType() == ResponseType.AUTH_SUCCESS) {
             this.token = resp.getToken();
-            this.currentUserId = resp.getUserId();
             this.currentUsername = username;
         }
         return resp;
@@ -72,7 +60,6 @@ public class ClientService implements AutoCloseable {
 
     public void logout() {
         this.token = null;
-        this.currentUserId = null;
         this.currentUsername = null;
     }
 

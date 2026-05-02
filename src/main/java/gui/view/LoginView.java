@@ -15,55 +15,53 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import network.Response;
 import network.ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.SocketException;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 
 public class LoginView {
     private static final Logger logger = LoggerFactory.getLogger(LoginView.class);
 
-    private final Callable<?> onLoggedInCallback;
+    private final Runnable onLoggedInCallback;
+    private final ClientService service;
     private final LocaleManager localeManager;
     private final VBox root;
 
-    private final TextField hostField;
-    private final TextField portField;
     private final TextField usernameField;
     private final PasswordField passwordField;
     private final PasswordField repeatField;
 
-    public LoginView(Callable<?> onLoggedInCallback, String defaultHost, int defaultPort, I18n i18n, LocaleManager localeManager, Strings strings) {
+    public LoginView(Runnable onLoggedInCallback, ClientService service, I18n i18n, LocaleManager localeManager, Strings strings) {
         this.onLoggedInCallback = onLoggedInCallback;
+        this.service = service;
         this.localeManager = localeManager;
 
         ChoiceBox<Locale> langBox = new ChoiceBox<>();
         for (Locale l : Strings.SUPPORTED) {
             langBox.getItems().add(l);
         }
-
         langBox.setValue(localeManager.getLocale());
-        langBox.setConverter(new javafx.util.StringConverter<>() {
+        langBox.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Locale l) {
-                return l == null ? "" : strings.localeDisplayName(l);
+            public String toString(Locale object) {
+                if (object == null) return "";
+                return strings.localeDisplayName(object);
             }
-
             @Override
-            public Locale fromString(String s) {
+            public Locale fromString(String string) {
                 return null;
             }
         });
         langBox.valueProperty().addListener((o, a, b) -> {
             if (b != null) localeManager.setLocale(b);
         });
-        Label langLabel = i18n.label("main.locale");
 
+        Label langLabel = i18n.label("main.locale");
         HBox langRow = new HBox(8, langLabel, langBox);
         langRow.setAlignment(Pos.CENTER_RIGHT);
 
@@ -71,21 +69,17 @@ public class LoginView {
         welcome.textProperty().bind(i18n.bind("auth.welcome"));
         welcome.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        hostField = new TextField(defaultHost);
-        portField = new TextField(String.valueOf(defaultPort));
         usernameField = new TextField();
         passwordField = new PasswordField();
         repeatField = new PasswordField();
 
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
-        grid.add(i18n.label("auth.host"), 0, 0); grid.add(hostField, 1, 0);
-        grid.add(i18n.label("auth.port"), 0, 1); grid.add(portField, 1, 1);
-        grid.add(i18n.label("auth.username"), 0, 2); grid.add(usernameField, 1, 2);
-        grid.add(i18n.label("auth.password"), 0, 3); grid.add(passwordField, 1, 3);
+        grid.add(i18n.label("auth.username"), 0, 0); grid.add(usernameField, 1, 0);
+        grid.add(i18n.label("auth.password"), 0, 1); grid.add(passwordField, 1, 1);
 
         Label repeatLabel = i18n.label("auth.repeat");
-        grid.add(repeatLabel, 0, 4); grid.add(repeatField, 1, 4);
+        grid.add(repeatLabel, 0, 2); grid.add(repeatField, 1, 2);
         repeatLabel.setVisible(false); repeatField.setVisible(false);
         repeatLabel.setManaged(false); repeatField.setManaged(false);
 
@@ -114,15 +108,6 @@ public class LoginView {
     }
 
     private void doAuth(boolean isRegister) {
-        String host = hostField.getText().trim();
-        int port;
-        try {
-            port = Integer.parseInt(portField.getText().trim());
-        }
-        catch (NumberFormatException ex) {
-            error(localeManager.t("auth.port"));
-            return;
-        }
         String user = usernameField.getText().trim();
         String pass = passwordField.getText();
 
@@ -135,12 +120,15 @@ public class LoginView {
         }
 
         try {
-            ClientService service = new ClientService(host, port);
             Response response;
-            response = service.login(user, pass);
+            if (isRegister) {
+                response = service.register(user, pass);
+            } else {
+                response = service.login(user, pass);
+            }
 
             if (response.getType() == ResponseType.AUTH_SUCCESS) {
-                onLoggedInCallback.call();
+                onLoggedInCallback.run();
             } else {
                 service.close();
                 String responseMessage = response.getMessage();

@@ -28,8 +28,7 @@ dependencies {
 
     implementation 'org.jline:jline:3.30.0'
 
-    implementation 'com.dxunvrs:common:latest.release'
-
+    implementation 'com.dxunvrs:common:1.4'
 }
 
 jar {

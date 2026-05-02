@@ -39,7 +39,7 @@ public class Strings {
 
     private Map<String, String> ruDict() {
         Map<String, String> m = new HashMap<>();
-        m.put("app.title", "Product Clien");
+        m.put("app.title", "Product Client");
         m.put("auth.login", "Войти");
         m.put("auth.register", "Зарегистрироваться");
         m.put("auth.username", "Имя пользователя");
